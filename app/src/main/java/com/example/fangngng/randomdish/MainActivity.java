@@ -2,6 +2,7 @@ package com.example.fangngng.randomdish;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView detailTitle, detailInfo;
     private ImageView detailImg;
+
+    private int imgNum = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,7 +78,11 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton(R.string.ensure, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            dishItem.add(MainActivity.this, input2.getText().toString(), info2.getText().toString(),"home",R.drawable.img1);
+                            String imgName = "img" + imgNum%4;
+                            int imgID = getResources().getIdentifier(imgName,"drawable","com.example.fangngng.randomdish");
+                            dishItem.add(MainActivity.this, input2.getText().toString(), info2.getText().toString(),"home",imgID);
+                            imgNum ++;
+                            Log.v("imgNum:", String.valueOf(imgNum));
                             adapter.notifyDataSetChanged();
                         }
                     })
