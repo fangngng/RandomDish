@@ -69,7 +69,7 @@ public class MyAdapter extends BaseAdapter {
         holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // dishItem.remove(activity, i);
+                dishItem.remove(activity, i);
 //                MyAdapter.notifyDataSetChanged();
             }
         });
