@@ -70,11 +70,15 @@ public class MyAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 dishItem.remove(activity, i);
-//                MyAdapter.notifyDataSetChanged();
+                NotifyChanged();
             }
         });
 
         return view;
+    }
+
+    private void NotifyChanged() {
+        this.notifyDataSetChanged();
     }
 
 

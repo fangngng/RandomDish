@@ -3,6 +3,7 @@ package com.example.fangngng.randomdish.Model;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.example.fangngng.randomdish.R;
@@ -19,18 +20,19 @@ public class DishItem {
     private List<Map<String, Object>> listItemInfo = new ArrayList<>();
 
 
-    public void add(Context context, String title, String info, String type) {
+
+    public void add(Context context, String title, String info, String type, int img) {
         DatabaseHelper dbHelper = new DatabaseHelper(context, "db_randomDish");
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         db.execSQL("insert into Dishs values( '" + title +
-                "','" + info + "','" + type + "') ");
+                "','" + info + "','" + type + "','" + img + "') ");
 
         Map<String, Object> map = new HashMap<>();
         map.put("title", title);
         map.put("info", info);
         map.put("type", type);
-        map.put("img", R.drawable.img1);
+        map.put("img", img);
         db.close();
 
         listItemInfo.add(map);

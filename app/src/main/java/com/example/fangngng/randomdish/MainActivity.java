@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton(R.string.ensure, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            dishItem.add(MainActivity.this, input2.getText().toString(), info2.getText().toString(),"home");
+                            dishItem.add(MainActivity.this, input2.getText().toString(), info2.getText().toString(),"home",R.drawable.img1);
                             adapter.notifyDataSetChanged();
                         }
                     })

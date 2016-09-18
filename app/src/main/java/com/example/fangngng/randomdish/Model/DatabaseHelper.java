@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String sql = "create table IF NOT EXISTS Dishs(" +
                 " DishTitle varchar(500) not null" +
                 ", DishInfo varchar(8000) " +
-                "， DishType varchar(500)" +
+                ", DishType varchar(500)" +
                 ", DishImg varchar(500))";
         db.execSQL(sql);
     }
