@@ -32,13 +32,20 @@
             android:textSize="13dp" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/view_btn11"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="删除"
-        android:focusable="false"
-        android:layout_margin="10dp"
-        />
+        android:gravity="right" >
+
+        <Button
+            android:id="@+id/view_btn11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="删除"
+            android:focusable="false"
+            android:layout_margin="10dp"
+            />
+    </LinearLayout>
 
 </LinearLayout>
