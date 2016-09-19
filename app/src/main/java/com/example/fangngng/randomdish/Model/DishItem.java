@@ -74,7 +74,7 @@ public class DishItem {
                 String type = c.getString(c.getColumnIndex("DishType"));
                 Log.i("type",type);
                 int imgID = c.getInt(c.getColumnIndex("DishImg"));
-                log.i("imgID", String.ValueOf(imgID));
+                Log.i("imgID", String.valueOf(imgID));
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("title", title);

@@ -1,7 +1,11 @@
 package com.example.fangngng.randomdish;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +25,15 @@ public class MyAdapter extends BaseAdapter {
     private final Activity activity;
     private List<Map<String, Object>> mData;
     private DishItem dishItem ;
-
-
+    private Bitmap img1, img2;
 
     public MyAdapter(Activity activity, DishItem dishItem) {
         this.inflater = LayoutInflater.from(activity);
         this.activity = activity;
         this.dishItem = dishItem;
         this.mData = dishItem.get();
+        img1 = BitmapFactory.decodeResource(activity.getResources(),R.drawable.img0);
+        img2 = BitmapFactory.decodeResource(activity.getResources(),R.drawable.img1);
     }
 
     @Override
@@ -49,9 +54,11 @@ public class MyAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
         ViewHolder holder;
+
+        Log.v("getview:i", String.valueOf(i));
+
         if (view == null) {
             holder = new ViewHolder();
-
             view = inflater.inflate(R.layout.listitem, null);
             holder.img = (ImageView) view.findViewById(R.id.img);
             holder.title = (TextView) view.findViewById(R.id.title11);
@@ -62,7 +69,7 @@ public class MyAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        holder.img.setBackgroundResource((Integer) mData.get(i).get("img"));
+        holder.img.setImageBitmap(((int) mData.get(i).get("img") & 1) == 1 ? img1:img2 );
         holder.title.setText((String) mData.get(i).get("title"));
         holder.txt.setText((String) mData.get(i).get("info"));
 
