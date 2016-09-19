@@ -73,12 +73,14 @@ public class DishItem {
                 Log.i("info",info);
                 String type = c.getString(c.getColumnIndex("DishType"));
                 Log.i("type",type);
+                int imgID = c.getInt(c.getColumnIndex("DishImg"));
+                log.i("imgID", String.ValueOf(imgID));
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("title", title);
                 map.put("info", info);
                 map.put("type", type);
-                map.put("img", R.drawable.img1);
+                map.put("img", imgID);
                 listItemInfo.add(map);
 
                 c.moveToNext();
