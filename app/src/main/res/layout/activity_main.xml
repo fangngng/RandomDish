@@ -53,20 +53,20 @@
     </LinearLayout>
 
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner"
-        android:layout_below="@+id/line_main1"
-        android:spinnerMode="dropdown"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+    <!--<Spinner-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/spinner"-->
+        <!--android:layout_below="@+id/line_main1"-->
+        <!--android:spinnerMode="dropdown"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true" />-->
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/list1"
-        android:layout_below="@+id/spinner"
+        android:layout_below="@+id/line_main1"
         >
 
 
