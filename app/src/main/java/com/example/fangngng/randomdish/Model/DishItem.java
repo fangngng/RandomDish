@@ -17,6 +17,7 @@ import java.util.Map;
  * Created by fangngng on 2016/8/24.
  */
 public class DishItem {
+//    private List<Map<String, Object>> listItemInfo = new ArrayList<>();
     private List<Map<String, Object>> listItemInfo = new ArrayList<>();
 
 
@@ -26,7 +27,10 @@ public class DishItem {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         db.execSQL("insert into Dishs values( '" + title +
-                "','" + info + "','" + type + "','" + img + "') ");
+                "','" + info
+                + "','" + type
+                + "','" + img
+                + "') ");
 
         Map<String, Object> map = new HashMap<>();
         map.put("title", title);
@@ -43,7 +47,7 @@ public class DishItem {
         DatabaseHelper dbHelper = new DatabaseHelper(context, "db_randomDish");
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sql = "delete from Dishs where DishTitle = '" + listItemInfo.get(i).get("title") +"'" ;
+        String sql = "delete from Dishs where DishTitle = '" + listItemInfo.get(i)+"'" ;
         db.execSQL(sql);
         db.close();
 
@@ -74,7 +78,7 @@ public class DishItem {
                 String type = c.getString(c.getColumnIndex("DishType"));
                 Log.i("type",type);
                 int imgID = c.getInt(c.getColumnIndex("DishImg"));
-                log.i("imgID", String.ValueOf(imgID));
+                Log.i("imgID", String.valueOf(imgID));
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("title", title);

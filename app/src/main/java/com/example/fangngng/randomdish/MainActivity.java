@@ -1,7 +1,10 @@
 package com.example.fangngng.randomdish;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +22,10 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+
 import com.example.fangngng.randomdish.Model.DishItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +33,6 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private ListView lv;
-    private List<Map<String, Object>> mData;
-    MyAdapter adapter;
 
     private EditText  input2,info2;
     private Button addDish, random;
@@ -39,7 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView detailTitle, detailInfo;
     private ImageView detailImg;
 
+
     private int imgNum = 1;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,14 +62,17 @@ public class MainActivity extends AppCompatActivity {
         random = (Button) findViewById(R.id.random);
         random.setFocusable(true);
 
-        dishSpinner = (Spinner) findViewById(R.id.spinner);
+        final List<Map<String, Object>> mData;
+
+//        dishSpinner = (Spinner) findViewById(R.id.spinner);
 
         dishItem = new DishItem(MainActivity.this);
 
         Log.v("init","init");
         lv = (ListView) findViewById(R.id.list1);
         mData = dishItem.get();
-        adapter = new MyAdapter(this,dishItem);
+        final EfficientAdapter adapter;
+        adapter = new EfficientAdapter(this, mData);
         lv.setAdapter(adapter);
 
         addDish.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         random.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInfo(randomDish());
+                showInfo(randomDish( mData));
             }
         });
 
@@ -135,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    private String randomDish() {
+    private String randomDish(List<Map<String, Object>> mData) {
 //        Random random = new Random(System.currentTimeMillis());
 //        int a = random.nextInt(mData.size());
 
@@ -148,5 +156,99 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
+    private static class EfficientAdapter extends BaseAdapter {
+        private LayoutInflater mInflater;
+        private Bitmap mIcon1;
+        private Bitmap mIcon2;
+        private List<Map<String, Object>> mData;
+
+        public EfficientAdapter(Context context, List<Map<String, Object>> mData) {
+            // Cache the LayoutInflate to avoid asking for a new one each time.
+            mInflater = LayoutInflater.from(context);
+            this.mData = mData;
+
+            // Icons bound to the rows.
+            mIcon1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img1);
+            mIcon2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img2);
+        }
+
+        /**
+         * The number of items in the list is determined by the number of speeches
+         * in our array.
+         *
+         * @see android.widget.ListAdapter#getCount()
+         */
+        public int getCount() {
+            return mData.size();
+        }
+
+        /**
+         * Since the data comes from an array, just returning the index is
+         * sufficent to get at the data. If we were using a more complex data
+         * structure, we would return whatever object represents one row in the
+         * list.
+         *
+         * @see android.widget.ListAdapter#getItem(int)
+         */
+        public Object getItem(int position) {
+            return position;
+        }
+
+        /**
+         * Use the array index as a unique id.
+         *
+         * @see android.widget.ListAdapter#getItemId(int)
+         */
+        public long getItemId(int position) {
+            return position;
+        }
+
+        /**
+         * Make a view to hold each row.
+         *
+         * @see android.widget.ListAdapter#getView(int, android.view.View,
+         *      android.view.ViewGroup)
+         */
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // A ViewHolder keeps references to children views to avoid unneccessary calls
+            // to findViewById() on each row.
+            ViewHolder holder;
+
+            // When convertView is not null, we can reuse it directly, there is no need
+            // to reinflate it. We only inflate a new View when the convertView supplied
+            // by ListView is null.
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.listitem, null);
+
+                // Creates a ViewHolder and store references to the two children views
+                // we want to bind data to.
+                holder = new ViewHolder();
+                holder.text = (TextView) convertView.findViewById(R.id.title_item);
+                holder.info = (TextView) convertView.findViewById(R.id.info_item);
+                holder.icon = (ImageView) convertView.findViewById(R.id.img_item);
+
+                convertView.setTag(holder);
+            } else {
+                // Get the ViewHolder back to get fast access to the TextView
+                // and the ImageView.
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            // Bind the data efficiently with the holder.
+            holder.text.setText(mData.get(position).get("title").toString());
+            holder.info.setText(mData.get(position).get("info").toString());
+            holder.icon.setImageBitmap((position & 1) == 1 ? mIcon1 : mIcon2);
+
+            return convertView;
+        }
+
+        static class ViewHolder {
+            TextView text;
+            ImageView icon;
+            TextView info;
+        }
+    }
 
 }
