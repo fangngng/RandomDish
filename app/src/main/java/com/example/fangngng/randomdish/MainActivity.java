@@ -6,9 +6,13 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,14 +29,17 @@ import android.widget.TextView;
 
 import com.example.fangngng.randomdish.Model.DishItem;
 
+import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Handler;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView lv;
+//    private ListView lv;
 
     private EditText  input2,info2;
     private Button addDish, random;
@@ -41,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView detailTitle, detailInfo;
     private ImageView detailImg;
+
+    private RecyclerView recyclerView;
+    private RecrycleAdapter recrycleAdapter;
 
 
     private int imgNum = 1;
@@ -51,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.v("onCreate","onCreate");
+        Log.i("onCreate","onCreate");
+
         init();
 
     }
@@ -62,41 +73,71 @@ public class MainActivity extends AppCompatActivity {
         random = (Button) findViewById(R.id.random);
         random.setFocusable(true);
 
-        final List<Map<String, Object>> mData;
-
-//        dishSpinner = (Spinner) findViewById(R.id.spinner);
-
+        final List<Map<String, Object>> mData ;
         dishItem = new DishItem(MainActivity.this);
+        mData = dishItem.get();
 
         Log.v("init","init");
-        lv = (ListView) findViewById(R.id.list1);
-        mData = dishItem.get();
-        final EfficientAdapter adapter;
-        adapter = new EfficientAdapter(this, mData);
-        lv.setAdapter(adapter);
+
+//        lv = (ListView) findViewById(R.id.list1);
+//        final EfficientAdapter adapter;
+//        adapter = new EfficientAdapter(this, mData);
+//        lv.setAdapter(adapter);
+
+//        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
+//         //设置刷新时动画的颜色，可以设置4个
+//         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light, android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
+//         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//
+//             @Override
+//             public void onRefresh() {
+//                 tv.setText("正在刷新");
+//                  // TODO Auto-generated method stub
+//                  new Handler().postDelayed(new Runnable() {
+//
+//                      @Override
+//                      public void run() {
+//                          // TODO Auto-generated method stub
+//                          tv.setText("刷新完成");
+//                          swipeRefreshLayout.setRefreshing(false);
+//                      }
+//                  }, 6000);
+//              }
+//          });
+
+        recyclerView = (RecyclerView) findViewById(R.id.recryList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setHasFixedSize(true);
+        recrycleAdapter = new RecrycleAdapter(this, mData);
+        recrycleAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(recrycleAdapter);
+
 
         addDish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            LayoutInflater inflater = getLayoutInflater();
-            final View dialog = inflater.inflate(R.layout.dialogadd,(ViewGroup)findViewById(R.id.dialog1));
-            input2 = (EditText)dialog.findViewById(R.id.input2);
-            info2 = (EditText)dialog.findViewById(R.id.info2);
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
-                    .setPositiveButton(R.string.ensure, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            String imgName = "img" + imgNum%4;
-                            int imgID = getResources().getIdentifier(imgName,"drawable","com.example.fangngng.randomdish");
-                            dishItem.add(MainActivity.this, input2.getText().toString(), info2.getText().toString(),"home",imgID);
-                            imgNum ++;
-                            Log.v("imgNum:", String.valueOf(imgNum));
-                            adapter.notifyDataSetChanged();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancle,null);
-            builder.setView(dialog);
-            builder.show();
+                LayoutInflater inflater = getLayoutInflater();
+                final View dialog = inflater.inflate(R.layout.dialogadd,(ViewGroup)findViewById(R.id.dialog1));
+                input2 = (EditText)dialog.findViewById(R.id.input2);
+                info2 = (EditText)dialog.findViewById(R.id.info2);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setPositiveButton(R.string.ensure, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                String imgName = "img" + imgNum%4;
+                                int imgID = getResources().getIdentifier(imgName,"drawable",
+                                        "com.example.fangngng.randomdish");
+                                dishItem.add(MainActivity.this, input2.getText().toString(),
+                                        info2.getText().toString(),"home",imgID);
+                                imgNum ++;
+                                Log.i("imgNum:", String.valueOf(imgNum));
+                                recrycleAdapter.notifyDataSetChanged();
+                            }
+                        });
+                builder.setNegativeButton(R.string.cancle,null);
+                builder.setView(dialog);
+                builder.show();
             }
         });
 
@@ -107,33 +148,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.v("listviewLongClick:","remove");
-                dishItem.remove(MainActivity.this, i);
-                adapter.notifyDataSetChanged();
-                return true;
-            }
-        });
+//        recyclerView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Log.v("listviewLongClick:","remove");
+//                dishItem.remove(MainActivity.this, i);
+//                recrycleAdapter.notifyDataSetChanged();
+//                return true;
+//            }
+//        });
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                LayoutInflater inflater = getLayoutInflater();
-                final View dialog = inflater.inflate(R.layout.listitemdetail,(ViewGroup)findViewById(R.id.dialog1));
-                detailTitle = (TextView) dialog.findViewById(R.id.detailTitle);
-                detailInfo = (TextView) dialog.findViewById(R.id.detailInfo);
-                detailImg = (ImageView) dialog.findViewById(R.id.detailImg);
-                detailTitle.setText( dishItem.get().get(i).get("title").toString());
-                detailInfo.setText( dishItem.get().get(i).get("info").toString());
-                detailImg.setBackgroundResource((Integer) dishItem.get().get(i).get("img"));
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
-                        .setNegativeButton(R.string.cancle,null);
-                builder.setView(dialog);
-                builder.show();
-            }
-        });
+//        recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                LayoutInflater inflater = getLayoutInflater();
+//                final View dialog = inflater.inflate(R.layout.listitemdetail,(ViewGroup)findViewById(R.id.dialog1));
+//                detailTitle = (TextView) dialog.findViewById(R.id.detailTitle);
+//                detailInfo = (TextView) dialog.findViewById(R.id.detailInfo);
+//                detailImg = (ImageView) dialog.findViewById(R.id.detailImg);
+//                detailTitle.setText( dishItem.get().get(i).get("title").toString());
+//                detailInfo.setText( dishItem.get().get(i).get("info").toString());
+//                detailImg.setBackgroundResource((Integer) dishItem.get().get(i).get("img"));
+//                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+//                        .setNegativeButton(R.string.cancle,null);
+//                builder.setView(dialog);
+//                builder.show();
+//            }
+//        });
     }
 
     public void showInfo(String info) {
@@ -154,105 +195,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return "添加个饭店吧。";
 
-    }
-
-
-
-    private static class EfficientAdapter extends BaseAdapter {
-        private LayoutInflater mInflater;
-        private Bitmap mIcon1, mIcon2, mIcon3, mIcon4, mIcon5, tempIcon;
-        private List<Map<String, Object>> mData;
-
-        public EfficientAdapter(Context context, List<Map<String, Object>> mData) {
-            // Cache the LayoutInflate to avoid asking for a new one each time.
-            mInflater = LayoutInflater.from(context);
-            this.mData = mData;
-
-            // Icons bound to the rows.
-            // mIcon1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img1);
-            // mIcon2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img2);
-            // mIcon3 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img3);
-            // mIcon4 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img0);
-            // mIcon5 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img4);
-        }
-
-        /**
-         * The number of items in the list is determined by the number of speeches
-         * in our array.
-         *
-         * @see android.widget.ListAdapter#getCount()
-         */
-        public int getCount() {
-            return mData.size();
-        }
-
-        /**
-         * Since the data comes from an array, just returning the index is
-         * sufficent to get at the data. If we were using a more complex data
-         * structure, we would return whatever object represents one row in the
-         * list.
-         *
-         * @see android.widget.ListAdapter#getItem(int)
-         */
-        public Object getItem(int position) {
-            return position;
-        }
-
-        /**
-         * Use the array index as a unique id.
-         *
-         * @see android.widget.ListAdapter#getItemId(int)
-         */
-        public long getItemId(int position) {
-            return position;
-        }
-
-        /**
-         * Make a view to hold each row.
-         *
-         * @see android.widget.ListAdapter#getView(int, android.view.View,
-         *      android.view.ViewGroup)
-         */
-        public View getView(int position, View convertView, ViewGroup parent) {
-            // A ViewHolder keeps references to children views to avoid unneccessary calls
-            // to findViewById() on each row.
-            ViewHolder holder;
-
-            // When convertView is not null, we can reuse it directly, there is no need
-            // to reinflate it. We only inflate a new View when the convertView supplied
-            // by ListView is null.
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.listitem, null);
-
-                // Creates a ViewHolder and store references to the two children views
-                // we want to bind data to.
-                holder = new ViewHolder();
-                holder.text = (TextView) convertView.findViewById(R.id.title_item);
-                holder.info = (TextView) convertView.findViewById(R.id.info_item);
-                holder.icon = (ImageView) convertView.findViewById(R.id.img_item);
-
-                convertView.setTag(holder);
-            } else {
-                // Get the ViewHolder back to get fast access to the TextView
-                // and the ImageView.
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            // Bind the data efficiently with the holder.
-            holder.text.setText(mData.get(position).get("title").toString());
-            holder.info.setText(mData.get(position).get("info").toString());
-            holder.icon.setImageResource((int)mData.get(position).get("img"));
-            
-            return convertView;
-        }
-
-
-        static class ViewHolder {
-            TextView text;
-            ImageView icon;
-            TextView info;
-            Button btn;
-        }
     }
 
 }
