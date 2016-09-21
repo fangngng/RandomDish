@@ -17,7 +17,6 @@ import java.util.Map;
  * Created by fangngng on 2016/8/24.
  */
 public class DishItem {
-//    private List<Map<String, Object>> listItemInfo = new ArrayList<>();
     private List<Map<String, Object>> listItemInfo = new ArrayList<>();
 
 
@@ -47,7 +46,8 @@ public class DishItem {
         DatabaseHelper dbHelper = new DatabaseHelper(context, "db_randomDish");
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sql = "delete from Dishs where DishTitle = '" + listItemInfo.get(i)+"'" ;
+        String sql = "delete from Dishs where DishTitle = '" + listItemInfo.get(i).get("title").toString() +"'" ;
+        Log.v("remove sql:",sql);
         db.execSQL(sql);
         db.close();
 

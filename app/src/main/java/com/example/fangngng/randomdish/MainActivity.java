@@ -110,9 +110,10 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.v("listviewLongClick:","remove");
                 dishItem.remove(MainActivity.this, i);
                 adapter.notifyDataSetChanged();
-                return false;
+                return true;
             }
         });
 
@@ -148,8 +149,7 @@ public class MainActivity extends AppCompatActivity {
 //        int a = random.nextInt(mData.size());
 
         if (mData.size() > 0) {
-            int b = Integer.valueOf((int) (Math.random() * mData.size()));
-
+            int b = (int) (Math.random() * mData.size());
             return dishItem.get().get(b).get("title").toString();
         }
         return "添加个饭店吧。";
@@ -169,11 +169,11 @@ public class MainActivity extends AppCompatActivity {
             this.mData = mData;
 
             // Icons bound to the rows.
-            mIcon1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img1);
-            mIcon2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img2);
-            mIcon3 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img3);
-            mIcon4 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img0);
-            mIcon5 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img4);
+            // mIcon1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img1);
+            // mIcon2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img2);
+            // mIcon3 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img3);
+            // mIcon4 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img0);
+            // mIcon5 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img4);
         }
 
         /**
@@ -241,23 +241,17 @@ public class MainActivity extends AppCompatActivity {
             // Bind the data efficiently with the holder.
             holder.text.setText(mData.get(position).get("title").toString());
             holder.info.setText(mData.get(position).get("info").toString());
-            switch(position%5 ) {
-                case 0: tempIcon = mIcon1; break;
-                case 1: tempIcon = mIcon2; break;
-                case 2: tempIcon = mIcon3; break;
-                case 3: tempIcon = mIcon4; break;
-                case 4: tempIcon = mIcon5; break;
-                default: tempIcon = mIcon1;
-            }
-            holder.icon.setImageBitmap(tempIcon);
-
+            holder.icon.setImageResource((int)mData.get(position).get("img"));
+            
             return convertView;
         }
+
 
         static class ViewHolder {
             TextView text;
             ImageView icon;
             TextView info;
+            Button btn;
         }
     }
 

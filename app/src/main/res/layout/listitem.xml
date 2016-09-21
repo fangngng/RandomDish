@@ -32,20 +32,5 @@
             android:textSize="13dp" />
     </LinearLayout>
 
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="right" >-->
-
-        <!--<Button-->
-            <!--android:id="@+id/view_btn11"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="end"-->
-            <!--android:text="删除"-->
-            <!--android:focusable="false"-->
-            <!--android:layout_margin="10dp"-->
-            <!--/>-->
-    <!--</LinearLayout>-->
 
 </LinearLayout>
