@@ -160,8 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static class EfficientAdapter extends BaseAdapter {
         private LayoutInflater mInflater;
-        private Bitmap mIcon1;
-        private Bitmap mIcon2;
+        private Bitmap mIcon1, mIcon2, mIcon3, mIcon4, mIcon5, tempIcon;
         private List<Map<String, Object>> mData;
 
         public EfficientAdapter(Context context, List<Map<String, Object>> mData) {
@@ -172,6 +171,9 @@ public class MainActivity extends AppCompatActivity {
             // Icons bound to the rows.
             mIcon1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img1);
             mIcon2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img2);
+            mIcon3 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img3);
+            mIcon4 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img0);
+            mIcon5 = BitmapFactory.decodeResource(context.getResources(), R.drawable.img4);
         }
 
         /**
@@ -239,7 +241,15 @@ public class MainActivity extends AppCompatActivity {
             // Bind the data efficiently with the holder.
             holder.text.setText(mData.get(position).get("title").toString());
             holder.info.setText(mData.get(position).get("info").toString());
-            holder.icon.setImageBitmap((position & 1) == 1 ? mIcon1 : mIcon2);
+            switch(position%5 ) {
+                case 0: tempIcon = mIcon1; break;
+                case 1: tempIcon = mIcon2; break;
+                case 2: tempIcon = mIcon3; break;
+                case 3: tempIcon = mIcon4; break;
+                case 4: tempIcon = mIcon5; break;
+                default: tempIcon = mIcon1;
+            }
+            holder.icon.setImageBitmap(tempIcon);
 
             return convertView;
         }
