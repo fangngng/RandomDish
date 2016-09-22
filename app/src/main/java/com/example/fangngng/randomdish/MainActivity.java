@@ -79,32 +79,29 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v("init","init");
 
-//        lv = (ListView) findViewById(R.id.list1);
-//        final EfficientAdapter adapter;
-//        adapter = new EfficientAdapter(this, mData);
-//        lv.setAdapter(adapter);
+       swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
+        //设置刷新时动画的颜色，可以设置4个
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light, 
+            android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            
+            @Override
+            public void onRefresh() {
+                tv.setText("正在刷新");
+                 // TODO Auto-generated method stub
+                 new Handler().postDelayed(new Runnable() {
 
-//        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
-//         //设置刷新时动画的颜色，可以设置4个
-//         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light, android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
-//         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//
-//             @Override
-//             public void onRefresh() {
-//                 tv.setText("正在刷新");
-//                  // TODO Auto-generated method stub
-//                  new Handler().postDelayed(new Runnable() {
-//
-//                      @Override
-//                      public void run() {
-//                          // TODO Auto-generated method stub
-//                          tv.setText("刷新完成");
-//                          swipeRefreshLayout.setRefreshing(false);
-//                      }
-//                  }, 6000);
-//              }
-//          });
+                     @Override
+                     public void run() {
+                         // TODO Auto-generated method stub
+                         tv.setText("刷新完成");
+                         swipeRefreshLayout.setRefreshing(false);
+                     }
+                 }, 6000);
+             }
+         });
 
+        // use recyclerView to replace listview
         recyclerView = (RecyclerView) findViewById(R.id.recryList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -113,34 +110,15 @@ public class MainActivity extends AppCompatActivity {
         recrycleAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(recrycleAdapter);
 
-
+        // add a new dish place
         addDish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater inflater = getLayoutInflater();
-                final View dialog = inflater.inflate(R.layout.dialogadd,(ViewGroup)findViewById(R.id.dialog1));
-                input2 = (EditText)dialog.findViewById(R.id.input2);
-                info2 = (EditText)dialog.findViewById(R.id.info2);
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setPositiveButton(R.string.ensure, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                String imgName = "img" + imgNum%4;
-                                int imgID = getResources().getIdentifier(imgName,"drawable",
-                                        "com.example.fangngng.randomdish");
-                                dishItem.add(MainActivity.this, input2.getText().toString(),
-                                        info2.getText().toString(),"home",imgID);
-                                imgNum ++;
-                                Log.i("imgNum:", String.valueOf(imgNum));
-                                recrycleAdapter.notifyDataSetChanged();
-                            }
-                        });
-                builder.setNegativeButton(R.string.cancle,null);
-                builder.setView(dialog);
-                builder.show();
+                AddNewDish();
             }
         });
 
+        // random a dish 
         random.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -193,8 +171,31 @@ public class MainActivity extends AppCompatActivity {
             int b = (int) (Math.random() * mData.size());
             return dishItem.get().get(b).get("title").toString();
         }
-        return "添加个饭店吧。";
+        return "添加个饭馆吧。";
+    }
 
+    private void AddNewDish () {
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialog = inflater.inflate(R.layout.dialogadd,(ViewGroup)findViewById(R.id.dialog1));
+        input2 = (EditText)dialog.findViewById(R.id.input2);
+        info2 = (EditText)dialog.findViewById(R.id.info2);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setPositiveButton(R.string.ensure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String imgName = "img" + imgNum%4;
+                        int imgID = getResources().getIdentifier(imgName,"drawable",
+                                "com.example.fangngng.randomdish");
+                        dishItem.add(MainActivity.this, input2.getText().toString(),
+                                info2.getText().toString(),"home",imgID);
+                        imgNum ++;
+                        Log.i("imgNum:", String.valueOf(imgNum));
+                        recrycleAdapter.notifyDataSetChanged();
+                    }
+                });
+        builder.setNegativeButton(R.string.cancle,null);
+        builder.setView(dialog);
+        builder.show();
     }
 
 }
