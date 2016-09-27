@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecrycleAdapter recrycleAdapter;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
 
     private int imgNum = 1;
 
@@ -67,39 +71,41 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        bindData();
+        super.onStart();
+    }
 
-    public void init() {
-        addDish = (Button) findViewById(R.id.addDish);
-        random = (Button) findViewById(R.id.random);
-        random.setFocusable(true);
+    public void bindData() {
 
         final List<Map<String, Object>> mData ;
         dishItem = new DishItem(MainActivity.this);
         mData = dishItem.get();
 
-        Log.v("init","init");
 
-       swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
         //设置刷新时动画的颜色，可以设置4个
-        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light, 
-            android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light,
+                android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            
             @Override
             public void onRefresh() {
-                tv.setText("正在刷新");
-                 // TODO Auto-generated method stub
-                 new Handler().postDelayed(new Runnable() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
 
-                     @Override
-                     public void run() {
-                         // TODO Auto-generated method stub
-                         tv.setText("刷新完成");
-                         swipeRefreshLayout.setRefreshing(false);
-                     }
-                 }, 6000);
-             }
-         });
+                        try{
+                            bindData();
+//                            Thread.sleep(3000);
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        handler.sendEmptyMessage(1);
+                    }
+                }).start();
+            }
+        });
 
         // use recyclerView to replace listview
         recyclerView = (RecyclerView) findViewById(R.id.recryList);
@@ -110,6 +116,23 @@ public class MainActivity extends AppCompatActivity {
         recrycleAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(recrycleAdapter);
 
+
+        // random a dish
+        random.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInfo(randomDish( mData));
+            }
+        });
+    }
+
+    public void init() {
+        addDish = (Button) findViewById(R.id.addDish);
+        random = (Button) findViewById(R.id.random);
+        random.setFocusable(true);
+
+        Log.v("init","init");
+
         // add a new dish place
         addDish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,13 +141,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // random a dish 
-        random.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showInfo(randomDish( mData));
-            }
-        });
 
 //        recyclerView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 //            @Override
@@ -164,9 +180,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String randomDish(List<Map<String, Object>> mData) {
-//        Random random = new Random(System.currentTimeMillis());
-//        int a = random.nextInt(mData.size());
-
         if (mData.size() > 0) {
             int b = (int) (Math.random() * mData.size());
             return dishItem.get().get(b).get("title").toString();
@@ -197,5 +210,20 @@ public class MainActivity extends AppCompatActivity {
         builder.setView(dialog);
         builder.show();
     }
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 1 :
+                    swipeRefreshLayout.setRefreshing(false);
+                    recrycleAdapter.notifyDataSetChanged();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
 }
