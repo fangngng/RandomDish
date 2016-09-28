@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,12 +34,9 @@ import android.widget.Toast;
 
 import com.example.fangngng.randomdish.Model.DishItem;
 
-import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogRecord;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -53,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MyRecycleAdapter recrycleAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ItemTouchHelper mItemTouchHelper;
     
     private int imgNum = 1;
 
@@ -104,10 +104,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recryList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new RecycleViewDivider(MainActivity.this,
-                LinearLayoutManager.VERTICAL, 20, Color.GRAY)); //设置分割线
+                LinearLayoutManager.VERTICAL, 20, Color.BLACK)); //设置分割线
         recrycleAdapter = new MyRecycleAdapter(mData);
         recrycleAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(recrycleAdapter);
+//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+//            @Override
+//            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {//处理拖拽的事件
+//                return false;
+//            }
+//            @Override
+//            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {//处理侧滑的事件
+//                dishItem.remove(MainActivity.this, viewHolder.getAdapterPosition());
+//                recrycleAdapter.notifyDataSetChanged();
+//            }
+//        });
+//        itemTouchHelper.attachToRecyclerView(recyclerView);
+
         recrycleAdapter.setmOnItemClickListener(new MyRecycleAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view, int i) {
@@ -117,9 +130,10 @@ public class MainActivity extends AppCompatActivity {
                 detailTitle = (TextView) dialog.findViewById(R.id.detailTitle);
                 detailInfo = (TextView) dialog.findViewById(R.id.detailInfo);
                 detailImg = (ImageView) dialog.findViewById(R.id.detailImg);
+//                detailImg.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 detailTitle.setText( dishItem.get().get(i).get("title").toString());
                 detailInfo.setText( dishItem.get().get(i).get("info").toString());
-                detailImg.setBackgroundResource((Integer) dishItem.get().get(i).get("img"));
+//                detailImg.setBackgroundResource((Integer) dishItem.get().get(i).get("img"));
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
                         .setNegativeButton(R.string.cancle,null);
                 builder.setView(dialog);
@@ -131,25 +145,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "长按："+i, Toast.LENGTH_SHORT).show();
             }
         });
-
-
-//       recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//           @Override
-//           public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//               LayoutInflater inflater = getLayoutInflater();
-//               final View dialog = inflater.inflate(R.layout.listitemdetail,(ViewGroup)findViewById(R.id.dialog1));
-//               detailTitle = (TextView) dialog.findViewById(R.id.detailTitle);
-//               detailInfo = (TextView) dialog.findViewById(R.id.detailInfo);
-//               detailImg = (ImageView) dialog.findViewById(R.id.detailImg);
-//               detailTitle.setText( dishItem.get().get(i).get("title").toString());
-//               detailInfo.setText( dishItem.get().get(i).get("info").toString());
-//               detailImg.setBackgroundResource((Integer) dishItem.get().get(i).get("img"));
-//               AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
-//                       .setNegativeButton(R.string.cancle,null);
-//               builder.setView(dialog);
-//               builder.show();
-//           }
-//       });
 
         // 随机按钮
         random.setOnClickListener(new View.OnClickListener() {

@@ -85,7 +85,7 @@ public class EfficientAdapter extends BaseAdapter {
             // we want to bind data to.
             holder = new ViewHolder();
             holder.text = (TextView) convertView.findViewById(R.id.title_item);
-            holder.info = (TextView) convertView.findViewById(R.id.info_item);
+//            holder.info = (TextView) convertView.findViewById(R.id.info_item);
             holder.icon = (ImageView) convertView.findViewById(R.id.img_item);
 
             convertView.setTag(holder);
@@ -97,7 +97,7 @@ public class EfficientAdapter extends BaseAdapter {
 
         // Bind the data efficiently with the holder.
         holder.text.setText(mData.get(position).get("title").toString());
-        holder.info.setText(mData.get(position).get("info").toString());
+//        holder.info.setText(mData.get(position).get("info").toString());
         holder.icon.setImageResource((int)mData.get(position).get("img"));
 
         return convertView;
