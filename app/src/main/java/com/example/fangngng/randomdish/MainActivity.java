@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
@@ -27,7 +28,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 import com.example.fangngng.randomdish.Model.DishItem;
 
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView detailImg;
 
     private RecyclerView recyclerView;
-    private RecrycleAdapter recrycleAdapter;
+    private MyRecycleAdapter recrycleAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     
     private int imgNum = 1;
@@ -99,20 +100,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //设置recyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recryList);
-        recrycleAdapter = new RecrycleAdapter(this, mData);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new RecycleViewDivider(MainActivity.this,
+                LinearLayoutManager.VERTICAL, 20, Color.GRAY)); //设置分割线
+        recrycleAdapter = new MyRecycleAdapter(mData);
         recrycleAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(recrycleAdapter);
+        recrycleAdapter.setmOnItemClickListener(new MyRecycleAdapter.OnItemClickListener(){
+            @Override
+            public void onItemClick(View view, int i) {
+                Toast.makeText(MainActivity.this, "点击："+i,Toast.LENGTH_SHORT).show();
+                LayoutInflater inflater = getLayoutInflater();
+                final View dialog = inflater.inflate(R.layout.listitemdetail,(ViewGroup)findViewById(R.id.dialog1));
+                detailTitle = (TextView) dialog.findViewById(R.id.detailTitle);
+                detailInfo = (TextView) dialog.findViewById(R.id.detailInfo);
+                detailImg = (ImageView) dialog.findViewById(R.id.detailImg);
+                detailTitle.setText( dishItem.get().get(i).get("title").toString());
+                detailInfo.setText( dishItem.get().get(i).get("info").toString());
+                detailImg.setBackgroundResource((Integer) dishItem.get().get(i).get("img"));
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                        .setNegativeButton(R.string.cancle,null);
+                builder.setView(dialog);
+                builder.show();
+            }
 
-    //    recyclerView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-    //        @Override
-    //        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-    //            Log.v("recyclerViewLongClick:","remove");
-    //            dishItem.remove(MainActivity.this, i);
-    //            recrycleAdapter.notifyDataSetChanged();
-    //            return true;
-    //        }
-    //    });
+            @Override
+            public void onItemLongClick(View view, int i) {
+                Toast.makeText(MainActivity.this, "长按："+i, Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
 //       recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //           @Override
@@ -149,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.v("init","init");
 
-        // 添加按钮点击事件
+        // 添加按钮的点击事件
         addDish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
