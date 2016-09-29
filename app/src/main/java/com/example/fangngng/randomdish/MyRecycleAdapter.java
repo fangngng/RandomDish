@@ -55,7 +55,7 @@ public class MyRecycleAdapter extends RecyclerView.Adapter<MyRecycleAdapter.View
                 public boolean onLongClick(View view) {
                     int pos = holder.getLayoutPosition();
                     mOnItemClickListener.onItemLongClick(holder.itemView, pos);
-                    return false;
+                    return true;
                 }
             });
         }

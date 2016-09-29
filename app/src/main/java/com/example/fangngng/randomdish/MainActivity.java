@@ -79,27 +79,6 @@ public class MainActivity extends AppCompatActivity {
         dishItem = new DishItem(MainActivity.this);
         mData = dishItem.get();
 
-        //设置主界面的刷新控件
-        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
-        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light,
-                android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            bindData();
-                        }catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        handler.sendEmptyMessage(1);
-                    }
-                }).start();
-            }
-        });
-
         //设置recyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recryList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -108,19 +87,21 @@ public class MainActivity extends AppCompatActivity {
         recrycleAdapter = new MyRecycleAdapter(mData);
         recrycleAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(recrycleAdapter);
-//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-//            @Override
-//            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {//处理拖拽的事件
-//                return false;
-//            }
-//            @Override
-//            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {//处理侧滑的事件
-//                dishItem.remove(MainActivity.this, viewHolder.getAdapterPosition());
-//                recrycleAdapter.notifyDataSetChanged();
-//            }
-//        });
-//        itemTouchHelper.attachToRecyclerView(recyclerView);
-
+        //滑动操作
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {//处理拖拽的事件
+                return false;
+            }
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {//处理侧滑的事件
+                dishItem.remove(MainActivity.this, viewHolder.getAdapterPosition());
+                // mData = dishItem.get();
+                recrycleAdapter.notifyDataSetChanged();
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+        //点击操作
         recrycleAdapter.setmOnItemClickListener(new MyRecycleAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view, int i) {
@@ -146,6 +127,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //设置主界面的刷新控件
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light,
+                android.R.color.holo_red_light, android.R.color.holo_orange_light, android.R.color.holo_green_light);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            dishItem.getDate();
+                            recrycleAdapter.notifyDataSetChanged();
+                            // bindData();
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        handler.sendEmptyMessage(1);
+                    }
+                }).start();
+            }
+        });
+
         // 随机按钮
         random.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         random = (Button) findViewById(R.id.random);
         random.setFocusable(true);
 
-        Log.v("init","init");
+        Log.i("init","init");
 
         // 添加按钮的点击事件
         addDish.setOnClickListener(new View.OnClickListener() {
