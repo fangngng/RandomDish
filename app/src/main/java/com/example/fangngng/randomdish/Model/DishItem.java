@@ -18,20 +18,35 @@ import java.util.Map;
  */
 public class DishItem {
     private List<Map<String, Object>> listItemInfo = new ArrayList<>();
-
+    private DatabaseHelper dbHelper;
 
 
     public void add(Context context, String title, String info, String type, int img) {
         DatabaseHelper dbHelper = new DatabaseHelper(context, "db_randomDish");
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        db.execSQL("insert into Dishs values( '" + title +
-                "','" + info
-                + "','" + type
-                + "','" + img
+        db.execSQL("insert into Dishs(DishTitle, DishInfo, DishType, DishImg) values( '" 
+                + title + "','" + info + "','" 
+                + type  + "','" + img
                 + "') ");
 
+        int ID = 0;
+        String sql = "select last_insert_rowid() ID ";
+        Cursor c = db.rawQuery(sql, new String[]{});
+        if ( c.moveToFirst()) {
+            c.moveToFirst();
+            while(!c.isAfterLast()){
+                Log.i("c.getCount:",String.valueOf(c.getCount()));
+
+                ID = c.getInt(c.getColumnIndex("ID"));
+
+                c.moveToNext();
+            }
+        }
+        c.close();
+
         Map<String, Object> map = new HashMap<>();
+        map.put("ID", ID);
         map.put("title", title);
         map.put("info", info);
         map.put("type", type);
@@ -46,8 +61,8 @@ public class DishItem {
         DatabaseHelper dbHelper = new DatabaseHelper(context, "db_randomDish");
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sql = "delete from Dishs where DishTitle = '" + listItemInfo.get(i).get("title").toString() +"'" ;
-        Log.v("remove sql:",sql);
+        String sql = "delete from Dishs where ID = " + listItemInfo.get(i).get("ID") ;
+        Log.i("remove sql:",sql);
         db.execSQL(sql);
         db.close();
 
@@ -60,8 +75,13 @@ public class DishItem {
     }
 
     public DishItem(Context context) {
-        DatabaseHelper dbHelper = new DatabaseHelper(context, "db_randomDish");
+        dbHelper = new DatabaseHelper(context, "db_randomDish");
+        getDate();
+    }
+
+    public void getDate() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+        listItemInfo.clear();
 
         String sql = "select * from Dishs ";
         Cursor c = db.rawQuery(sql, new String[]{});
@@ -79,8 +99,12 @@ public class DishItem {
                 Log.i("type",type);
                 int imgID = c.getInt(c.getColumnIndex("DishImg"));
                 Log.i("imgID", String.valueOf(imgID));
+                int ID = c.getInt(c.getColumnIndex("ID"));
+                Log.i("ID", String.valueOf(ID));
+                
 
                 Map<String, Object> map = new HashMap<>();
+                map.put("ID", ID);  
                 map.put("title", title);
                 map.put("info", info);
                 map.put("type", type);
@@ -93,7 +117,5 @@ public class DishItem {
         }
         c.close();
         db.close();
-
-
     }
 }
