@@ -4,4 +4,9 @@
     <string name="ensure">确定</string>
     <string name="cancle">取消</string>
     <string name="randomNoDish">添加个饭店吧。</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>
