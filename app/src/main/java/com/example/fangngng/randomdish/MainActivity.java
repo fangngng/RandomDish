@@ -105,13 +105,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        List<Map<String, Object>> mData ;
+        mData = dishItem.get();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
+        if (id == R.id.nav_add) {   //添加
+            AddNewDish();
+        } else if (id == R.id.nav_refresh) {    //刷新
+            dishItem.getDate();
+            recrycleAdapter.notifyDataSetChanged();
+        } else if (id == R.id.nav_random) {
+           showInfo(randomDish( mData));
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
@@ -139,6 +142,7 @@ public class MainActivity extends AppCompatActivity
         final List<Map<String, Object>> mData ;
         mData = dishItem.get();
 
+        //随机
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -270,22 +274,12 @@ public class MainActivity extends AppCompatActivity
 
     //初始化主要界面和参数，不包括数据
     public void init() {
-//        addDish = (Button) findViewById(R.id.addDish);
-//        random = (Button) findViewById(R.id.random);
-//        random.setFocusable(true);
 
         dishItem = new DishItem(MainActivity.this);
         tempDate = new HashMap<>();
 
         Log.i("init","init");
 
-//        // 添加按钮的点击事件
-//        addDish.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                AddNewDish();
-//            }
-//        });
     }
 
     public void showInfo(String info) {
