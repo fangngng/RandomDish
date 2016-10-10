@@ -24,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     private SwipeRefreshLayout swipeRefreshLayout;
     private ItemTouchHelper mItemTouchHelper;
     private HashMap<String, Object> tempDate;
+    private Spinner mainSpinner;
+    private String dishType;
     
     private int imgNum = 1;
 
@@ -141,6 +145,29 @@ public class MainActivity extends AppCompatActivity
         //列表数据
         final List<Map<String, Object>> mData ;
         mData = dishItem.get();
+        final List<String> mType;
+        mType = dishItem.getType();
+        if(mType.isEmpty()) {
+            mType.add("默认");
+        }
+
+        Spinner mainSpinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, mType);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mainSpinner.setAdapter(adapter);
+        mainSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                dishType = mType.get(position);
+                Toast.makeText(MainActivity.this, "点击的是:" + mType.get(position), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         //随机
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -219,7 +246,7 @@ public class MainActivity extends AppCompatActivity
         recrycleAdapter.setmOnItemClickListener(new MyRecycleAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view, int i) {
-                Toast.makeText(MainActivity.this, "点击："+i,Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "点击："+i,Toast.LENGTH_SHORT).show();
                 LayoutInflater inflater = getLayoutInflater();
                 final View dialog = inflater.inflate(R.layout.listitemdetail,(ViewGroup)findViewById(R.id.dialog1));
                 detailTitle = (TextView) dialog.findViewById(R.id.detailTitle);
@@ -313,7 +340,7 @@ public class MainActivity extends AppCompatActivity
                         int imgID = getResources().getIdentifier(imgName,"drawable",
                                 "com.example.fangngng.randomdish");
                         dishItem.add(MainActivity.this, input2.getText().toString(),
-                                info2.getText().toString(),"home",imgID);
+                                info2.getText().toString(), dishType, imgID);
                         imgNum ++;
                         Log.i("imgNum:", String.valueOf(imgNum));
                         recrycleAdapter.notifyDataSetChanged();

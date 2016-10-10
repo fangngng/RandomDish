@@ -18,6 +18,7 @@ import java.util.Map;
  */
 public class DishItem {
     private List<Map<String, Object>> listItemInfo = new ArrayList<>();
+    private List<String> listType = new ArrayList<>();
     private DatabaseHelper dbHelper;
 
 
@@ -110,6 +111,9 @@ public class DishItem {
                 map.put("type", type);
                 map.put("img", imgID);
                 listItemInfo.add(map);
+                if(!listType.contains(type)) {
+                    listType.add(type);
+                }
 
                 c.moveToNext();
             }
@@ -117,5 +121,9 @@ public class DishItem {
         }
         c.close();
         db.close();
+    }
+
+    public List<String> getType() {
+        return listType;
     }
 }
