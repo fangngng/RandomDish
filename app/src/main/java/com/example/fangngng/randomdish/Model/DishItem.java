@@ -77,14 +77,14 @@ public class DishItem {
 
     public DishItem(Context context) {
         dbHelper = new DatabaseHelper(context, "db_randomDish");
-        getDate();
+        getDate("home");
     }
 
-    public void getDate() {
+    public void getDate(String dishType) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         listItemInfo.clear();
 
-        String sql = "select * from Dishs ";
+        String sql = "select * from Dishs where DishType = '" + dishType + "'";
         Cursor c = db.rawQuery(sql, new String[]{});
         Log.i("c.getCount:",String.valueOf(c.getCount()));
         if ( c.moveToFirst()) {

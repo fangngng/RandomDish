@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_add) {   //添加
             AddNewDish();
         } else if (id == R.id.nav_refresh) {    //刷新
-            dishItem.getDate();
+            dishItem.getDate(dishType);
             recrycleAdapter.notifyDataSetChanged();
         } else if (id == R.id.nav_random) {
            showInfo(randomDish( mData));
@@ -145,29 +145,7 @@ public class MainActivity extends AppCompatActivity
         //列表数据
         final List<Map<String, Object>> mData ;
         mData = dishItem.get();
-        final List<String> mType;
-        mType = dishItem.getType();
-        if(mType.isEmpty()) {
-            mType.add("默认");
-        }
 
-        Spinner mainSpinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, mType);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mainSpinner.setAdapter(adapter);
-        mainSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                dishType = mType.get(position);
-                Toast.makeText(MainActivity.this, "点击的是:" + mType.get(position), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         //随机
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -199,6 +177,15 @@ public class MainActivity extends AppCompatActivity
 
     // 从数据库中获取数据，显示到主界面上
     public void bindData() {
+
+
+        final List<String> mType;
+        mType = dishItem.getType();
+        if(mType.isEmpty()) {
+            mType.add("默认");
+        }
+        dishType = mType.get(0);
+
         //列表数据
         final List<Map<String, Object>> mData ;
         mData = dishItem.get();
@@ -268,6 +255,28 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
+        Spinner mainSpinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, mType);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mainSpinner.setAdapter(adapter);
+        mainSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                dishType = mType.get(position);
+                dishItem.getDate(dishType);
+                recrycleAdapter.notifyDataSetChanged();
+                Toast.makeText(MainActivity.this, "点击的是:" + mType.get(position), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
         //设置主界面的刷新控件
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_container);
         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_light,
@@ -279,7 +288,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         try{
-                            dishItem.getDate();
+                            dishItem.getDate(dishType);
                             recrycleAdapter.notifyDataSetChanged();
                         }catch (Exception e) {
                             e.printStackTrace();
@@ -289,6 +298,7 @@ public class MainActivity extends AppCompatActivity
                 }).start();
             }
         });
+
 
 //        // 随机按钮
 //        random.setOnClickListener(new View.OnClickListener() {
@@ -301,7 +311,6 @@ public class MainActivity extends AppCompatActivity
 
     //初始化主要界面和参数，不包括数据
     public void init() {
-
         dishItem = new DishItem(MainActivity.this);
         tempDate = new HashMap<>();
 
@@ -310,11 +319,44 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showInfo(String info) {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.randomResult)
-                .setMessage(info)
-                .setPositiveButton(R.string.ensure, null)
-                .show();
+        Log.i("info",info);
+//        Toast.makeText(MainActivity.this, "info:" + info, Toast.LENGTH_LONG).show();
+        LayoutInflater inflater = getLayoutInflater();
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        if(!info.equals("")) {
+            final View dialog = inflater.inflate(R.layout.result_random_main,(ViewGroup)findViewById(R.id.resultDialog));
+            TextView resultTitle = (TextView) dialog.findViewById(R.id.resultTitle);
+            TextView resultItemName = (TextView) dialog.findViewById(R.id.resultItemName);
+            TextView resultInfo = (TextView) dialog.findViewById(R.id.resultInfo);
+            ImageView resultImg = (ImageView) dialog.findViewById(R.id.resultImage);
+            resultTitle.setText("那就吃这个：");
+            resultItemName.setText(info);
+            builder.setNegativeButton(R.string.cancle,null);
+            builder.setView(dialog);
+            builder.show();
+        }else {
+            final View dialog = inflater.inflate(R.layout.result2_random_main,(ViewGroup)findViewById(R.id.result2Dialog));
+            TextView resultTitle = (TextView) dialog.findViewById(R.id.result2Info);
+            resultTitle.setText("先添加一些用餐地点吧！");
+            builder.setNegativeButton(R.string.cancle,null);
+            builder.setView(dialog);
+            builder.show();
+        }
+
+//        builder.setPositiveButton(R.string.ensure, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                String imgName = "img" + imgNum%4;
+//                int imgID = getResources().getIdentifier(imgName,"drawable",
+//                        "com.example.fangngng.randomdish");
+//                dishItem.add(MainActivity.this, input2.getText().toString(),
+//                        info2.getText().toString(), dishType, imgID);
+//                imgNum ++;
+//                Log.i("imgNum:", String.valueOf(imgNum));
+//                recrycleAdapter.notifyDataSetChanged();
+//            }
+//        });
+
     }
 
     //随机一个数据，并返回结果
@@ -323,13 +365,13 @@ public class MainActivity extends AppCompatActivity
             int b = (int) (Math.random() * mData.size());
             return dishItem.get().get(b).get("title").toString();
         }
-        return "添加个饭馆吧。";
+        return "";
     }
 
     //添加一个新的数据
     private void AddNewDish () {
         LayoutInflater inflater = getLayoutInflater();
-        final View dialog = inflater.inflate(R.layout.dialogadd,(ViewGroup)findViewById(R.id.dialog1));
+        final View dialog = inflater.inflate(R.layout.add_dialog_main,(ViewGroup)findViewById(R.id.dialog1));
         input2 = (EditText)dialog.findViewById(R.id.input2);
         info2 = (EditText)dialog.findViewById(R.id.info2);
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
