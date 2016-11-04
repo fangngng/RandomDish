@@ -1,6 +1,7 @@
 package com.example.fangngng.randomdish;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
@@ -114,13 +115,16 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_add) {   //添加
             AddNewDish();
+//            Intent intent = new Intent(MainActivity.this, MessageMainActivity.class);
+//            startActivity(intent);
         } else if (id == R.id.nav_refresh) {    //刷新
             dishItem.getDate(dishType);
             recrycleAdapter.notifyDataSetChanged();
         } else if (id == R.id.nav_random) {
            showInfo(randomDish( mData));
         } else if (id == R.id.nav_manage) {
-
+            Intent intent = new Intent(MainActivity.this, MessageMainActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -391,6 +395,7 @@ public class MainActivity extends AppCompatActivity
         builder.setNegativeButton(R.string.cancle,null);
         builder.setView(dialog);
         builder.show();
+
     }
 
     //撤销数据删除
