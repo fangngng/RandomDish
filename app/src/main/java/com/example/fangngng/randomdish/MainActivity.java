@@ -1,8 +1,13 @@
 package com.example.fangngng.randomdish;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -47,13 +52,15 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
     //    private ListView lv;
-    private EditText  input2,info2;
+    private EditText  input2, info2;
 
     private Button addDish, random;
     private DishItem dishItem ;
     private Spinner dishSpinner;
     private TextView detailTitle, detailInfo;
     private ImageView detailImg;
+    private IntentFilter intentFilter;
+    private NetworkChangeReceiver networkChangeReceiver;
 
     private RecyclerView recyclerView;
     private MyRecycleAdapter recrycleAdapter;
@@ -66,83 +73,17 @@ public class MainActivity extends AppCompatActivity
     private int imgNum = 1;
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem addItem = menu.findItem(R.id.action_add);
-        addItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                AddNewDish();
-                return false;
-            }
-        });
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        List<Map<String, Object>> mData ;
-        mData = dishItem.get();
-
-        if (id == R.id.nav_add) {   //添加
-            AddNewDish();
-//            Intent intent = new Intent(MainActivity.this, MessageMainActivity.class);
-//            startActivity(intent);
-        } else if (id == R.id.nav_refresh) {    //刷新
-            dishItem.getDate(dishType);
-            recrycleAdapter.notifyDataSetChanged();
-        } else if (id == R.id.nav_random) {
-           showInfo(randomDish( mData));
-        } else if (id == R.id.nav_manage) {
-            Intent intent = new Intent(MainActivity.this, MessageMainActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("天降美食");
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        networkChangeReceiver = new NetworkChangeReceiver();
+        registerReceiver(networkChangeReceiver, intentFilter);
 
         init();
 
@@ -172,6 +113,26 @@ public class MainActivity extends AppCompatActivity
         Log.i("onCreate","onCreate");
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkChangeReceiver);
+    }
+
+    class NetworkChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager connectivityManager = (ConnectivityManager)
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isAvailable()) {
+                Toast.makeText(context, "net work is available", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(context, "net work is not available", Toast.LENGTH_SHORT).show();
+        }   }
+    }
+
 
     @Override
     protected void onStart() {
@@ -418,4 +379,78 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
+
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem addItem = menu.findItem(R.id.action_add);
+        addItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                AddNewDish();
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        List<Map<String, Object>> mData ;
+        mData = dishItem.get();
+
+        if (id == R.id.nav_add) {   //添加
+            AddNewDish();
+//            Intent intent = new Intent(MainActivity.this, MessageMainActivity.class);
+//            startActivity(intent);
+        } else if (id == R.id.nav_refresh) {    //刷新
+            dishItem.getDate(dishType);
+            recrycleAdapter.notifyDataSetChanged();
+        } else if (id == R.id.nav_random) {
+            showInfo(randomDish( mData));
+        } else if (id == R.id.nav_manage) {
+            Intent intent = new Intent(MainActivity.this, MessageMainActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_share) {
+            Intent intent = new Intent("com.example.broadcasttest.MY_BROADCAST");
+            sendBroadcast(intent);
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 }
